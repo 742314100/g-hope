@@ -1,0 +1,20 @@
+@charset "utf-8";
+*{margin:0;padding:0;}
+html,body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,code,form,fieldset,legend,input,button,textarea,p,blockquote,th,td{margin:0;padding:0;font-family:Microsoft YaHei;}
+html{overflow-x: hidden;}
+body{overflow: hidden; min-width: 1200px;font-size:12px;}
+ul,ol,li { list-style:none;}
+img{ border:0;}
+a{color:#000;text-decoration:none}
+em,i{font-style:normal;}
+a:focus,input{outline:none;}
+a{outline:none;star:expression(this.onFocus=this.blur());}
+
+
+
+
+
+
+
+
+
