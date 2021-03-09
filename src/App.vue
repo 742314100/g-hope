@@ -42,6 +42,10 @@
                     <span>03/02</span>
                     <a href="https://mp.weixin.qq.com/s/Q1x1n0tNAON4-4_eN-VqwA">《末日血战》2021年名人堂第二期，s100大神...</a>
                   </p>
+                  <p class="news-info">
+                    <span>03/02</span>
+                    <a href="https://mp.weixin.qq.com/s/Q1x1n0tNAON4-4_eN-VqwA">《末日血战》2021年名人堂第二期，s100大神...</a>
+                  </p>
                 </swiper-slide>
                 <swiper-slide>
                   <p class="recommend" style="text-align: left;"><a href="//mrxz.huangxiu1.com/gg/144015.html">[最新] 《末日血战》闪断更新公告</a></p>
@@ -63,24 +67,58 @@
           </div>
           <div class="banner-box">
               <div class="swiper-banner">
-                <swiper class="swiper" :options="swiperOptions1">
+                <swiper class="swiper1" :options="Options1" ref="Swiper1"> 
                   <swiper-slide>
                     <a href="//mrxz.huangxiu1.com/hd/141118.html">
 											<img src="//staticres.huangxiu1.com//resource/mrxz/h007/h59/img202101142149460.jpeg" alt="">
 										</a>
                   </swiper-slide>
                   <swiper-slide>
-                    <a href="//mrxz.huangxiu1.com/hd/141118.html">
-											<img src="//staticres.huangxiu1.com//resource/mrxz/h007/h59/img202101142149460.jpeg" alt="">
+                    <a href="//mrxz.huangxiu1.com/hd/138871.html">
+											<img src="//staticres.huangxiu1.com//resource/mrxz/h007/h47/img202012101613560.jpg" alt="">
 										</a>
                   </swiper-slide>
+                  <swiper-slide>
+                    <a href="//mrxz.huangxiu1.com/hd/135106.html">
+											<img src="//staticres.huangxiu1.com//resource/mrxz/h007/h41/img202010151424150.jpg" alt="">
+										</a>
+                  </swiper-slide>
+                  <div class="swiper-pagination" slot="pagination"></div>
                 </swiper>
               </div>
             </div>
         </div>
+        <div class="five-img">
+				    <div class="swiper-fimg">
 
+              <swiper class="swiper2" :options="Options2" ref="Swiper2"> 
+                <swiper-slide>
+                  <a href="//mrxz.huangxiu1.com/hd/141118.html">
+                    <img src="//staticres.huangxiu1.com//resource/mrxz/h007/h30/img202004021631230.jpg" alt="">
+                  </a>
+                </swiper-slide>
+                <swiper-slide>
+                  <a href="//mrxz.huangxiu1.com/hd/138871.html">
+                    <img src="//staticres.huangxiu1.com//resource/mrxz/h007/h30/img202004021633010.jpg" alt="">
+                  </a>
+                </swiper-slide>
+                <swiper-slide>
+                  <a href="//mrxz.huangxiu1.com/hd/135106.html">
+                    <img src="//staticres.huangxiu1.com//resource/mrxz/h007/h30/img202004021632460.jpg" alt="">
+                  </a>
+                </swiper-slide>
+                
+              </swiper>
+
+
+
+
+				  </div>
+        </div>
+        
       </div>
     </div>
+
   </div>
 </template>
 
@@ -96,29 +134,20 @@ export default {
     return {
       cur:0,
       swiperOptions: {
-        direction: "vertical",
-        pagination:{         //分页器
-            el:'.swiper-pagination',
-            clickable:true
-        },
-        loop:true,     //循环
-        autoplay:{      //自动播放
-            delay:1500,
-            disableOnInteraction:false
-        },
-        speed:1500
+        direction : 'vertical',
+        height : window.innerHeight, //解决高度问题
+          onTransitionStart: function (swiper){
+                this.isHideIcon = swiper.activeIndex <= 3;
+          }.bind(this)
+        
       },
-      swiperOptions1: {
-        pagination:{         //分页器
-            el:'.swiper-pagination',
-            clickable:true
-        },
-        loop:true,     //循环
-        autoplay:{      //自动播放
-            delay:1500,
-            disableOnInteraction:false
-        },
-        speed:1500
+      Options1: {     
+      　　pagination: {
+            el: '.swiper-pagination'
+          },
+      },
+      Options2: {     
+      　　
       }
 
     }
@@ -138,13 +167,13 @@ export default {
     }
   },
   mounted() {
-
+    //this.swiper.slideTo(1, 1000, false)
   },
-  computed:{
-    swiper(){
-      return this.$refs.mySwiper.$swiper
-    }
-  }
+  computed: {
+      swiper() {
+        return this.$refs.mySwiper.$swiper
+      }
+    },
 
 }
 </script>
@@ -293,5 +322,19 @@ export default {
     width: 505px;
     height: 287px;
     overflow: hidden;
+}
+.five-img {
+    height: 430px;
+    position: absolute;
+    top: 500px;
+    left: 0;
+    width: 100%;
+}
+.five-img {
+    height: 430px;
+    position: absolute;
+    top: 500px;
+    left: 0;
+    width: 100%;
 }
 </style>
