@@ -1,53 +1,99 @@
+
+const path = require("path");
+const CompressionWebpackPlugin = require("compression-webpack-plugin"); // 开启gzip压缩， 按需引用
+const productionGzipExtensions = /\.(js|css|json|txt|html|ico|svg)(\?.*)?$/i; // 开启gzip压缩， 按需写入
+const BundleAnalyzerPlugin = require("webpack-bundle-analyzer")
+  .BundleAnalyzerPlugin; // 打包分析
+const IS_PROD = ["production"].includes(process.env.NODE_ENV);
+const resolve = (dir) => path.join(__dirname, dir);
 module.exports = {
-  // baseUrl从 Vue CLI 3.3 起已弃用，请使用publicPath
-  // 默认情况下，Vue CLI 会假设你的应用是被部署在一个域名的根路径上，例如 https://www.my-app.com/。
-  // 如果应用被部署在一个子路径上，你就需要用这个选项指定这个子路径。例如，如果你的应用被部署在 https://www.my-app.com/my-app/，则设置 publicPath 为 /my-app/。
-  publicPath:
-    process.env.NODE_ENV === "production" ? "/production-sub-path/" : "/",
-  // 当运行 vue-cli-service build 时生成的生产环境构建文件的目录。
-  // 注意目标目录在构建之前会被清除 (构建时传入 --no-clean 可关闭该行为)。
-  // 默认值'dist'
-  outputDir: "my-app",
-  // 放置生成的静态资源 (js、css、img、fonts) 的目录(相对于outputDir目录)。
-  // 默认值''
-  assetsDir: "assets",
-  //指定生成的 index.html 的输出路径 (相对于 outputDir)。也可以是一个绝对路径。
-  // 默认值'index.html'
-  indexPath: "myIndex.html",
-  // 默认情况下，生成的静态资源在它们的文件名中包含了 hash 以便更好的控制缓存。
-  filenameHashing: false,
-  // 是否在开发环境下通过 eslint-loader 在每次保存时 lint 代码。这个值会在 @vue/cli-plugin-eslint 被安装之后生效。
-  lintOnSave: process.env.NODE_ENV !== "production",
+  //publicPath: process.env.NODE_ENV === "production" ? "/site/vue-demo/" : "./", // 公共路径
+  publicPath: "./", // 公共路径
+  indexPath: "index.html", // 相对于打包路径index.html的路径
+  outputDir: process.env.outputDir || "dist", // 'dist', 生产环境构建文件的目录
+  assetsDir: "static", // 相对于outputDir的静态资源(js、css、img、fonts)目录
+  lintOnSave: false, // 是否在开发环境下通过 eslint-loader 在每次保存时 lint 代码
+  runtimeCompiler: true, // 是否使用包含运行时编译器的 Vue 构建版本
+  productionSourceMap: !IS_PROD, // 生产环境的 source map
+  parallel: require("os").cpus().length > 1, // 是否为 Babel 或 TypeScript 使用 thread-loader。该选项在系统的 CPU 有多于一个内核时自动启用，仅作用于生产构建。
+  pwa: {}, // 向 PWA 插件传递选项。
+  chainWebpack: (config) => {
+    config.resolve.symlinks(true);
+    // 修复热更新失效
+    // 如果使用多页面打包，使用vue inspect --plugins查看html是否在结果数组中
+    config.plugin("html").tap((args) => {
+      // 修复 Lazy loading routes Error
+      args[0].chunksSortMode = "none";
+      return args;
+    });
+    config.resolve.alias // 添加别名
+      .set("@", resolve("src"))
+      .set("@assets", resolve("src/assets"))
+      .set("@components", resolve("src/components"))
+      .set("@views", resolve("src/views"))
+      .set("@store", resolve("src/store"))
+      .set("@api", resolve("src/api"));
 
-  //是否使用包含运行时编译器的 Vue 构建版本。设置为 true 后你就可以在 Vue 组件中使用 template 选项了，但是这会让你的应用额外增加 10kb 左右。
-  runtimeCompiler: false,
 
-  // 如果你不需要生产环境的 source map，可以将其设置为 false 以加速生产环境构建。
-  productionSourceMap: false,
-
-  // 所有 webpack-dev-server 的选项都支持。
-  devServer: {
-    host: "localhost",
-    port: 8080, // 端口号
-    https: false,
-    open: true, //配置自动启动浏览器
-
-    // 配置多个代理
-    proxy: {
-      "/api": {
-        target: "http://localhost:3000", // 本地模拟数据服务器
-        changeOrigin: true,
-        pathRewrite: {
-          "^/api": "" // 去掉接口地址中的api字符串
-        }
-      },
-      "/foo": {
-        target: "http://localhost:8080", // 本地模拟数据服务器
-        changeOrigin: true,
-        pathRewrite: {
-          "^/foo": "" // 去掉接口地址中的foo字符串
-        }
-      }
+    // 打包分析, 打包之后自动生成一个名叫report.html文件(可忽视)
+    if (IS_PROD) {
+      config.plugin("webpack-report").use(BundleAnalyzerPlugin, [
+        {
+          analyzerMode: "static",
+        },
+      ]);
     }
-  }
+  },
+  configureWebpack: (config) => {
+    // 开启 gzip 压缩
+    // 需要 npm i -D compression-webpack-plugin
+    const plugins = [];
+    if (IS_PROD) {
+      plugins.push(
+        new CompressionWebpackPlugin({
+          filename: "[path].gz[query]",
+          algorithm: "gzip",
+          test: productionGzipExtensions,
+          threshold: 10240,
+          minRatio: 0.8,
+        })
+      );
+    }
+    config.plugins = [...config.plugins, ...plugins];
+  },
+
+  devServer: {
+    overlay: {
+      // 让浏览器 overlay 同时显示警告和错误
+      warnings: false,
+      errors: false,
+    },
+    host: "localhost",
+    port: 3000, // 端口号
+    https: false, // https:{type:Boolean}
+    open: false, //配置自动启动浏览器
+    hotOnly: true, // 热更新
+    //proxy: 'http://127.0.0.1:3000' // 配置跨域处理,只有一个代理
+    // proxy: {
+    //   //配置多个跨域
+    //   "/": {
+    //     target: "http://127.0.0.1:3000",
+    //     changeOrigin: true,
+    //     // ws: true,//websocket支持
+    //     secure: false,
+    //     pathRewrite: {
+    //       "/": "",
+    //     },
+    //   },
+    //   "/api": {
+    //     target: "http://api.tianapi.com",
+    //     changeOrigin: true,
+    //     //ws: true,//websocket支持
+    //     secure: false,
+    //     pathRewrite: {
+    //       "^/api": "",
+    //     },
+    //   },
+    // },
+  },
 };
