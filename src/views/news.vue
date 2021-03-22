@@ -100,7 +100,6 @@ export default {
     ...mapGetters({
       getTabIndex:'getTabIndex'
     }),
-
   },
   watch: {
     getTabIndex (newVal) {
