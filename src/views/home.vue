@@ -20,7 +20,7 @@
                 <el-carousel height="240px" direction="vertical" :autoplay="false" ref="carousel" indicator-position="outside" >
                     <el-carousel-item v-for="(item,index) in swiperNews" :key="index">
                       <p class="recommend" v-for="(item1,index1) in item.content" :key="index1">
-                        <a href="#">{{item1.new_content}}</a>
+                        <a @click="detail(item1)">{{item1}}</a>
                       </p>
                   </el-carousel-item>
                 </el-carousel>
@@ -131,20 +131,20 @@ export default {
       console.log(str);
     },
     getSwiperList(){
-      console.log(1)
       getHomeSwiperList().then(res => {
-        console.log(2)
-        console.log(res);
+        console.log(res.data.data)
+        this.swiperNews=res.data.data;
       });
+    },
+    detail(item){
+      console.log(item);
+      this.$router.push('/detail');
     }
-
   },
   mounted() {
-
+    this.getSwiperList();
   },
-  computed: {
-
-    },
+  computed: {},
 
 }
 </script>
@@ -238,6 +238,7 @@ export default {
     color: #000;
     font-size: 16px;
     line-height: 25px;
+    cursor:pointer;
 }
 .news-info{
     color: #8a645d;
