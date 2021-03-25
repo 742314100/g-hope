@@ -11,19 +11,18 @@
             <p>您的位置：<a>官网首页</a> &gt; 新闻中心</p>
           </div>
           <div class="ny-tab">
-            <a :class="cur ==index ? 'cur':''" @click="tab(index)" v-for="(item,index) in tabContent" :key="index">{{item}}</a>
+            <a :class="cur ==index ? 'cur':''" @click="tab(index)" v-for="(item,index) in newsList" :key="index">{{item.title}}</a>
 					</div>
           <ul class="news-list">
-            <li v-for="(item,index) in curNewsList" :key="index">
+            <li v-for="(item,index) in curNewsList" :key="index" @click="detail(index)">
 							<span class="list-tit">{{item.tit}}</span>
 							<div class="list-txt">
-								<a href="">
+								<a>
 									<h3>{{item.info}} </h3>
 									<span>{{item.des}}</span>
 								</a>
 							</div>
             </li>
-
 					</ul>
 				</div>
       </div>
@@ -32,79 +31,14 @@
 </template>
 
 <script>
-import {mapGetters} from 'vuex'
+import { mapGetters } from 'vuex'
+import { getNewsList } from "../api/newsList";
 export default {
   name: 'App',
   data(){
     return {
       cur:0,
-      tabContent:['最新资讯','公告','活动','攻略'],
-      newsList:{
-          "lastestNews": [{
-              "tit": "【最新】",
-              "info": "《末日血战》啤酒节活动",
-              "des": "活动时间：3月12日-3月18日"
-            },
-            {
-              "tit": "【最新】",
-              "info": "《末日血战》3月10日停服更新公告 ",
-              "des": "更新时间：3月10日早上7：30-8：30"
-            },
-            {
-              "tit": "【最新】",
-              "info": "《末日血战》啤酒节活动",
-              "des": "活动时间：3月12日-3月18日"
-            }
-          ],
-          "notice": [{
-              "tit": "【公告】",
-              "info": "《末日血战》3月10日停服更新公告 ",
-              "des": "更新时间：3月10日早上7：30-8：30"
-            },
-            {
-              "tit": "【公告】",
-              "info": "《末日血战》闪断更新公告 ",
-              "des": "更新时间：3月4日早上10：00-11:00"
-            },
-            {
-              "tit": "【公告】",
-              "info": "《末日血战》啤酒节活动",
-              "des": "活动时间：3月12日-3月18日"
-            }
-          ],
-          "activity": [{
-              "tit": "【活动】",
-              "info": "《末日血战》“金牛贺岁”春节限时活动 ",
-              "des": "活动时间：2月11日-2月17日"
-            },
-            {
-              "tit": "【活动】",
-              "info": "《末日血战》2021年名人堂第一期——尼古拉斯.毁灭 ",
-              "des": "活动时间：3月12日-3月18日"
-            },
-            {
-              "tit": "【活动】",
-              "info": "《末日血战》啤酒节活动",
-              "des": "活动时间：3月12日-3月18日"
-            }
-          ],
-          "strategy": [{
-              "tit": "【攻略】",
-              "info": "《末日血战》英雄基地快速升级攻略 ",
-              "des": "活动时间：3月12日-3月18日"
-            },
-            {
-              "tit": "【攻略】",
-              "info": "《末日血战》英雄攻略-埃契奥 ",
-              "des": "活动时间：3月12日-3月18日"
-            },
-            {
-              "tit": "【攻略】",
-              "info": "《末日血战》英雄攻略-玛瑟伊尔 ",
-              "des": "活动时间：3月12日-3月18日"
-            }
-          ]
-        },
+      newsList:[],
       curNewsList:{}
     }
   },
@@ -116,29 +50,43 @@ export default {
       this.cur=i;
       switch(i){
         case 0:
-          this.curNewsList=this.newsList.lastestNews;
+          this.curNewsList=this.newsList[0].content;
           break;
         case 1:
-          this.curNewsList=this.newsList.notice;
+          this.curNewsList=this.newsList[1].content;
           break;
         case 2:
-          this.curNewsList=this.newsList.activity;
+          this.curNewsList=this.newsList[2].content;
           break;
         case 3:
-          this.curNewsList=this.newsList.strategy;
+          this.curNewsList=this.newsList[3].content;
           break;
       }
+    },
+    getNewsList(){
+      getNewsList().then(res => {
+        this.newsList=res.data.data;
+        if(this.getTabIndex == 0){
+          this.cur=0;
+          this.curNewsList=this.newsList[0].content;
+        }else if(this.getTabIndex == 1){
+          this.cur=3;
+          this.curNewsList=this.newsList[3].content;
+        }
+      });
+    },
+    detail(i){
+      let curId=this.cur*5+i; //这里 不定
+      this.$router.push({
+        path: '/detail',
+        query: {
+          curId: curId
+        }});
     }
-
   },
   mounted() {
-    if(this.getTabIndex == 0){
-      this.cur=0;
-      this.curNewsList=this.newsList.lastestNews;
-    }else if(this.getTabIndex == 1){
-      this.cur=3;
-      this.curNewsList=this.newsList.strategy;
-    }
+    this.getNewsList();
+
   },
   computed:{
     ...mapGetters({
@@ -149,10 +97,10 @@ export default {
     getTabIndex (newVal) {
      if(newVal == 0){
       this.cur=0;
-      this.curNewsList=this.newsList.lastestNews;
+      this.curNewsList=this.newsList[0].content;
     }else if(newVal == 1){
       this.cur=3;
-      this.curNewsList=this.newsList.strategy;
+      this.curNewsList=this.newsList[3].content;
     }
     }
   },

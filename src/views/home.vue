@@ -20,7 +20,7 @@
                 <el-carousel height="240px" direction="vertical" :autoplay="false" ref="carousel" indicator-position="outside" >
                     <el-carousel-item v-for="(item,index) in swiperNews" :key="index">
                       <p class="recommend" v-for="(item1,index1) in item.content" :key="index1">
-                        <a @click="detail(item1)">{{item1}}</a>
+                        <a @click="detail(index1)">{{item1}}</a>
                       </p>
                   </el-carousel-item>
                 </el-carousel>
@@ -53,53 +53,13 @@
 
 <script>
 import { getHomeSwiperList } from "../api/homeSwiperList";
+import { mapActions } from "vuex";
 export default {
   name: 'App',
   data(){
     return {
       cur:0,
-      swiperNews:[
-                    {"title":"最新资讯",
-                      "content":[
-                                  {"new_content":"[最新] 《末日血战》3月10日停服更新公告"},
-                                  {"new_content":"《末日血战》闪断更新公告"},
-                                  {"new_content":"《末日血战》合服公告（s136-s145）"},
-                                  {"new_content":"《末日血战》2021年名人堂第二期，s100大神..."},
-                                  {"new_content":"《末日血战》“金牛贺岁”春节限时活动"},
-                                  {"new_content":"《末日血战》2月4日停服更新"}
-                                ]
-                    },
-                    {"title":"公告",
-                      "content":[
-                                  {"new_content":"[最新] 《末日血战》3月10日停服更新公告"},
-                                  {"new_content":"《末日血战》闪断更新公告"},
-                                  {"new_content":"《末日血战》合服公告（s136-s145）"},
-                                  {"new_content":"《末日血战》2月4日停服更新"},
-                                  {"new_content":"《末日血战》1月28日停服更新公告"},
-                                  {"new_content":"《末日血战》1月14日停服更新公告"}
-                                ]
-                    },
-                    {"title":"活动",
-                      "content":[
-                                  {"new_content":"[最新] 《末日血战》2021年名人堂第二期，s100大神..."},
-                                  {"new_content":"《末日血战》“金牛贺岁”春节限时活"},
-                                  {"new_content":"《末日血战》2021年名人堂第一期——尼古拉..."},
-                                  {"new_content":"《末日血战》名人堂第七期——s82黑龙1982"},
-                                  {"new_content":"《末日血战》黑水晶活动"},
-                                  {"new_content":"《末日血战》名人堂第六期——s102去征服"}
-                                ]
-                    },
-                    {"title":"攻略",
-                      "content":[
-                                  {"new_content":"[最新] 《末日血战》英雄强度排行榜"},
-                                  {"new_content":"《末日血战》英雄攻略-玛瑟伊尔"},
-                                  {"new_content":"《末日血战》英雄攻略-墨绯斯脱"},
-                                  {"new_content":"《末日血战》英雄攻略-维塔斯博士"},
-                                  {"new_content":"《末日血战》英雄攻略-德拉卡"},
-                                  {"new_content":"《末日血战》英雄攻略-拦路者"}
-                                ]
-                    }
-                  ],
+      swiperNews:[],
       swiperNewsImg:[
                       "//staticres.huangxiu1.com//resource/mrxz/h007/h47/img202012101613560.jpg",
                       "//staticres.huangxiu1.com//resource/mrxz/h007/h44/img202011121840550.jpg",
@@ -123,6 +83,9 @@ export default {
 
   },
   methods:{
+    ...mapActions({
+      setTabIndex:'setTabIndex'
+    }),
     changebg(index){
       this.cur = index;
       this.$refs.carousel.setActiveItem(index);
@@ -132,13 +95,16 @@ export default {
     },
     getSwiperList(){
       getHomeSwiperList().then(res => {
-        console.log(res.data.data)
         this.swiperNews=res.data.data;
       });
     },
-    detail(item){
-      console.log(item);
-      this.$router.push('/detail');
+    detail(index1){
+      let curId=this.cur*5+index1;
+      this.$router.push({
+        path: '/detail',
+        query: {
+          curId: curId
+        }});
     }
   },
   mounted() {

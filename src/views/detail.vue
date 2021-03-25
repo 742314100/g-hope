@@ -9,63 +9,60 @@
           </div>
           <p>您的位置：<a href="http://mrxz.huangxiu1.com">官网首页</a> &gt; 详情内容</p>
         </div>
-        <div class="ny-nr">
+        <div class="ny-nr" v-if="hasData">
 						<div class="ny-nr-tit">
-							<h3>《末日血战》闪断更新公告</h3>
-							<p>末日血战团队 发布于 2021-03-03 18:54:12</p>
+							<h3>{{details.title}}</h3>
+							<p> {{details.time}}</p>
 						</div>
 						<div class="ny-nr-txt">
 							亲爱的幸存者：<br>
-                <p class='indent'>为了优化各位幸存者的游戏体验，游戏将于3月4日进行闪断更新。闪断更新期间幸存者们仍然可以正常登陆游戏，希望各位幸存者相互转告~</p>
-                更新时间：3月4日早上10：00-11:00<br>
+                <p class='indent'>{{details.info}}</p>
+                更新时间：{{details.updateTime}}<br>
                 更新内容：<br>
-                1、更新周五活动资源<br>
-                2、生存危机活动现在可以长按连续攻击<br>
-                3、埃契奥增强<br>
+                <p v-for="(item,index) in updateContent" :key="index">{{item}}</p>
                 增强如下：<br>
-                5星技能一伤害提升至195%。<br>
-                5星技能二吸收免控率提升至6%。<br>
-                6星技能一伤害提升至235%。<br>
-                6星技能二降低速度提升至30，吸收速度提升至10，吸收免控率提升至15%。<br>
-                6星技能三速度增加提升至30。<br>
-                6星技能四伤害提升至至生命上限的15%。<br>
-                10星技能一伤害提升至285%。<br>
-                10星技能二降低速度提升至50，吸收速度提升至15，吸收免控率提升至25%。<br>
-                10星技能三速度增加提升至40。<br>
-                10星技能四伤害提升至至生命上限的20%。<br>
-                反击瞬间：血量低于50%时，获得50%减伤持续2回合（只触发一次）。<br>
-                蔑视：增加能量提升至25。<br>
-                唯快：增加效果释放主动技能时，增加同等于已损失血量百分比的攻击力和吸血，持续一回合，并将伤害提升至速度差额*1.5%。<br>
-                <br>
+                <p v-for="(item,index) in des" :key="index+999">{{item}}</p>
 						</div>
 				</div>
+        <div else class="noData">还没造数据</div>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-
+import { getDetails } from '../api/details'
 export default {
   name: 'App',
   data(){
     return {
-
-      curNewsList:{}
+      details:{},
+      updateContent:[],
+      des:[],
+      curId:'',
+      hasData:true
     }
   },
   components: {
 
   },
   methods:{
-
-
+    getDetails(){
+      getDetails({id:this.curId}).then(res => {
+        this.details=res.data.data[0] || [];
+        if(this.details.updateContent){
+          this.updateContent=this.details.updateContent.split('&');
+          this.des=this.details.des.split('&');
+        }else{
+          this.hasData=false;
+        }
+      });
+    },
   },
   mounted() {
-
+    this.curId=this.$route.query.curId;
+    this.getDetails();
   },
-
-
 
 }
 </script>
@@ -149,7 +146,12 @@ export default {
 .indent{
   text-indent: 16px;
 }
-
+.noData{
+  font-size:20px;
+  color:rgb(233, 16, 27);
+  text-align: center;
+  margin:100px auto;
+}
 
 
 
