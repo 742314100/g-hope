@@ -1,24 +1,31 @@
 <template>
   <div id="app">
     <div class="top">
-        <div class="tab">
-          <div @click="tab(index)" v-for="(item,index) in tabContent" :key="index">
-            <img src="../assets/img/logo.png" height=80 v-show="index == 2">
-            <span v-show="index != 2">{{item}}</span>
-          </div>
+      <div class="tab">
+        <div @click="tab(index)" v-for="(item,index) in tabContent" :key="index">
+          <img src="../assets/img/logo.png" height=80 v-show="index == 2">
+          <span v-show="index != 2">{{item}}</span>
         </div>
-        <div class="login">登录</div>
       </div>
+      <div v-if="getHasLogin">
+        <div class="register">欢迎，{{ getHasLogin }}</div>
+      </div>
+      <div v-else>
+        <div class="register" @click="login(0)">注册</div>
+        <div class="login" @click="login(1)">登录</div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
-import { mapActions } from "vuex";
+import { mapActions,mapGetters } from "vuex";
 export default {
   name: 'App',
   data(){
     return {
       tabContent:['新闻信息','游戏攻略','','礼包领取','客服中心'],
+      hasLogin:true
     }
   },
   methods:{
@@ -48,6 +55,15 @@ export default {
           this.setTabIndex(4);
           break;
       }
+    },
+    login(i){
+      this.$router.push({
+        path:'/login',
+        query:{
+          ifLogin:i,
+          random:Math.random()
+        }
+      });
     }
 
   },
@@ -55,7 +71,9 @@ export default {
 
   },
   computed: {
-
+    ...mapGetters({
+      getHasLogin:'getHasLogin'
+    }),
   }
 
 }
@@ -88,6 +106,14 @@ export default {
   font-size:16px;
   right:100px;
   top:40px;
+  cursor:pointer;
 }
-
+.register{
+  position:absolute;
+  color:#fff;
+  font-size:16px;
+  right:150px;
+  top:40px;
+  cursor:pointer;
+}
 </style>

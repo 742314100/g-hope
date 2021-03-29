@@ -6,6 +6,7 @@ import news from "../views/news"
 import giftCenter from '../views/giftCenter';
 import server from '../views/server'
 import detail from '../views/detail'
+import login from '../views/login'
 
 Vue.use(VueRouter);
 
@@ -40,6 +41,11 @@ const routes = [
     path: "/detail",
     name: "detail",
     component: detail,
+  },
+  {
+    path: "/login",
+    name: "login",
+    component: login,
   },
 ];
 

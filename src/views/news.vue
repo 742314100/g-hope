@@ -86,7 +86,6 @@ export default {
   },
   mounted() {
     this.getNewsList();
-
   },
   computed:{
     ...mapGetters({
